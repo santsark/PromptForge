@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PromptForge
+
+Enterprise-grade AI prompt engineering platform. Generate, compare, and rank prompts across Gemini, Claude, and DeepSeek using proven frameworks (RTF, COSTAR, RISEN, CRISPE, Chain of Thought, Few-Shot).
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+# Install dependencies
+npm install
+
+# Copy environment variables
+cp .env.example .env.local
+# Fill in your API keys and database URL
+
+# Run database migrations
+npx drizzle-kit push
+
+# Start development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Tech Stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Framework**: Next.js 16 (App Router, TypeScript)
+- **Database**: Neon Postgres + Drizzle ORM
+- **Auth**: NextAuth.js v5 (JWT + Credentials)
+- **AI**: Gemini 2.0 Flash, Claude 3 Haiku, DeepSeek Chat, GPT-4o (ranking)
+- **Charts**: Recharts
+- **Styling**: Tailwind CSS 4
 
-## Learn More
+## Deployment Checklist (Vercel)
 
-To learn more about Next.js, take a look at the following resources:
+- [ ] Create Vercel project and link repository
+- [ ] Add **all** env vars from `.env.example` in Vercel → Project Settings → Environment Variables
+- [ ] Set `DATABASE_URL` (pooled) and `DATABASE_URL_UNPOOLED` from Neon console
+- [ ] Set `NEXTAUTH_URL` to your Vercel domain (e.g. `https://promptforge.vercel.app`)
+- [ ] Set `AUTH_TRUST_HOST=true`
+- [ ] Run database migration: `npx drizzle-kit push`
+- [ ] Verify admin seed user exists in the `users` table
+- [ ] Seed the `llm_pricing` table with current model costs
+- [ ] Deploy and test: login → select framework → full prompt generation flow
+- [ ] Check Vercel function logs for cold start or timeout issues
+- [ ] Verify `/admin/analytics` loads for admin users
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## API Rate Limits
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Endpoint | Limit |
+|----------|-------|
+| `/api/clarify` | 20 calls/hour per user |
+| `/api/generate` | 10 calls/hour per user |
+| `/api/rank` | 10 calls/hour per user |
 
-## Deploy on Vercel
+## Project Structure
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+src/
+├── app/
+│   ├── (protected)/        # Auth-gated pages
+│   │   ├── admin/          # Admin dashboard
+│   │   └── app/            # User-facing app
+│   ├── api/                # API routes
+│   └── login/              # Login page
+├── components/             # Shared components
+├── db/                     # Schema & database
+├── lib/                    # Rate limiting, validation
+└── types/                  # TypeScript declarations
+```

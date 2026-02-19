@@ -1,0 +1,15 @@
+{
+    "framework": "nextjs",
+    "buildCommand": "npm run build",
+    "functions": {
+        "src/app/api/generate/route.ts": {
+            "maxDuration": 60
+        },
+        "src/app/api/rank/route.ts": {
+            "maxDuration": 30
+        },
+        "src/app/api/clarify/route.ts": {
+            "maxDuration": 15
+        }
+    }
+}
